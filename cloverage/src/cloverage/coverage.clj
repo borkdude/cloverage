@@ -3,7 +3,7 @@
   (:require [clojure.java.classpath :as cp]
             [clojure.java.io :as io]
             [clojure.test :as test]
-            [clojure.test.junit :as junit]
+            #_[clojure.test.junit :as junit]
             [clojure.tools.namespace.find :as ns-find]
             [cloverage.args :as args]
             [cloverage.debug :as debug]
@@ -104,7 +104,7 @@
     `(capture ~idx ~form)))
 
 (defn mark-loaded [namespace]
-  (binding [*ns* (find-ns 'clojure.core)]
+  #_(binding [*ns* (find-ns 'clojure.core)]
     (eval `(dosync (alter clojure.core/*loaded-libs* conj '~namespace)))))
 
 (defn remove-nses
@@ -212,7 +212,7 @@
                       {:errors (reduce + ((juxt :error :fail)
                                           (apply test/run-tests nses)))})]
       (if junit?
-        (do
+        false #_(do
           (.mkdirs (io/file output))
           (binding [test/*test-out* (io/writer (io/file output "junit.xml"))]
             (junit/with-junit-output (run-tests))))

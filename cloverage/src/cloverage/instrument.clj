@@ -4,7 +4,7 @@
             [cloverage.debug :as d]
             [cloverage.rewrite :refer [unchunk]]
             [cloverage.source :as source]
-            [riddley.walk :as rw]
+            [clojure.walk :as rw]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn- iobj? [form]
@@ -77,7 +77,7 @@
           (symbol (.getName ^Class o))
           (when (var? o)
             (let [^clojure.lang.Var o o]
-              (symbol (-> o .ns .name name) (-> o .sym name)))))
+              (symbol o) #_(symbol (-> o .ns .name name) (-> o .sym name)))))
         ;; changed to returned unnamespaced symbol if it fails to resolve
         s))))
 
@@ -185,7 +185,8 @@
     res))
 
 (defn- var->sym [^clojure.lang.Var fvar]
-  (let [it (name (.sym fvar))
+  (symbol fvar)
+  #_(let [it (name (.sym fvar))
         nsn (name (ns-name (.ns fvar)))]
     (symbol nsn it)))
 
@@ -294,7 +295,7 @@
   ;; https://github.com/ztellman/riddley/issues/33. We can work around it by removing the `::rw/transformed` key from
   ;; the form's metadata if present
   (let [form (vary-meta form dissoc ::rw/transformed)]
-    (wrap f line (rw/macroexpand form))))
+    (wrap f line (macroexpand form))))
 
 ;; Don't descend into atomic forms, but do wrap them
 (defmethod do-wrap :atomic [f line form _]
@@ -556,7 +557,7 @@
   [filename form line-hint instrumented-form]
   (try
     (binding [*file*        filename
-              *source-path* filename]
+              #_#_*source-path* filename]
       (eval instrumented-form))
     (binding [*print-meta* true]
       (d/tprn "Evalling" instrumented-form " with meta " (meta instrumented-form)))
@@ -626,6 +627,7 @@
         (d/dump-instrumented instrumented ns-symbol)
         instrumented)
       (catch Throwable e
+        (prn (ex-message e))
         (throw (ex-info (str "Error instrumenting " ns-symbol)
                         {:namespace ns-symbol
                          :filename  filename}

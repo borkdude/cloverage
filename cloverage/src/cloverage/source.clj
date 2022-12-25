@@ -22,7 +22,7 @@
     (some (fn [extension]
             (let [filename (str base extension)]
               ;; io/resource will return nil if the file doesn't exist
-              (when (io/resource filename (get-loader))
+              (when (io/resource filename #_(get-loader))
                 filename)))
           ns.file/clojure-extensions)))
 
@@ -39,7 +39,7 @@
                java.io.File))"
   [ns-symbol]
   (let [resource (or (some->> (resource-path ns-symbol)
-                              (.getResource (get-loader)))
+                              (io/resource ) #_(.getResource (get-loader)))
                      (io/file (resource-path ns-symbol))
                      (throw (ex-info (format "Cannot read ns declaration for namespace %s: cannot find file" ns-symbol)
                                      {:ns ns-symbol})))]
@@ -51,15 +51,15 @@
   "Given a classpath-relative path, return a relative source file path."
   [resource]
   (let [cwd           (-> (File. "") .getAbsolutePath (str "/"))
-        resource-path (-> (.getResource (get-loader) resource) .toURI .getPath)]
+        resource-path (-> (io/resource resource) #_(.getResource (get-loader) resource) .toURI .getPath)]
     (str/replace resource-path cwd "")))
 
 (defn resource-reader ^java.io.Closeable [resource]
   (if-let [resource (and resource
-                         (.getResourceAsStream
+                         (io/resource resource) #_(.getResourceAsStream
                           (get-loader)
                           resource))]
-    (InputStreamReader. resource) ; We assume the default charset is set correctly
+    (io/reader resource) #_(InputStreamReader. resource) ; We assume the default charset is set correctly
     (throw (IllegalArgumentException. (str "Cannot find resource " resource)))))
 
 (defn form-reader ^java.io.Closeable [ns-symbol]
@@ -76,7 +76,7 @@
   ;; `read-form` will return `nil` at the end of the file so keep reading forms until we run out
   (letfn [(read-form []
             (binding [*read-eval* false
-                      r/*data-readers* *data-readers*]
+                      #_#_r/*data-readers* *data-readers*]
               (r/read {:eof       ::eof
                        :features  #{:clj}
                        :read-cond :allow}

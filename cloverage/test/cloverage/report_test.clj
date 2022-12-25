@@ -15,7 +15,7 @@
       (let [exp-reader (repeatedly #(read pb-reader false nil))]
         (doall (take-while identity exp-reader))))))
 
-(defn- get-resource-as-stream
+#_(defn- get-resource-as-stream
   "open resource from classpath as stream"
   [resource]
   (.getResourceAsStream (clojure.lang.RT/baseLoader) resource))
@@ -23,7 +23,7 @@
 (defn- parse-resource
   "opens the resource-name and returns the parsed forms"
   [resource-name]
-  (parse-readable (io/reader (get-resource-as-stream resource-name))))
+  (parse-readable (io/reader (io/resource resource-name) #_(get-resource-as-stream resource-name))))
 
 (def test-raw-forms (vals (first (parse-resource "cloverage/sample/raw-data.clj"))))
 (def test-gathered-forms (first (parse-resource "cloverage/sample/raw-stats.clj")))
@@ -51,7 +51,7 @@
     (is (= '([:lib "lib"] [:file "file"]) (gather-stats [{:lib "lib" :file "file" :line 1}])))))
 
 (deftest gather-starts-converts-raw-forms
-  (with-redefs [cloverage.source/resource-reader (fn [filename] (io/reader (get-resource-as-stream filename)))]
+  (with-redefs [cloverage.source/resource-reader (fn [filename] (io/reader (io/resource filename) #_(get-resource-as-stream filename)))]
     (is (= test-gathered-forms (gather-stats test-raw-forms)))))
 
 (deftest lcov-report-writes-empty-report-with-no-forms
