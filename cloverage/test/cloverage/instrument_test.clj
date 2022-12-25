@@ -3,7 +3,7 @@
             [clojure.test :as t]
             [clojure.tools.logging :as log]
             [cloverage.instrument :as inst]
-            [riddley.walk :as rw]))
+            [clojure.walk :as rw]))
 
 (def simple-forms
   "Simple forms that do not require macroexpansion and have no side effects."

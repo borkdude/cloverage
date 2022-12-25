@@ -5,7 +5,7 @@
             [cloverage.coverage :as cov]
             [cloverage.instrument :as inst]
             [cloverage.source :as src]
-            [riddley.walk :as rw]
+            [clojure.walk :as rw]
             [clojure.java.io :as io]))
 
 (defn- denamespace

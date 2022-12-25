@@ -64,7 +64,7 @@
 
 (defn form-reader ^java.io.Closeable [ns-symbol]
   (if-let [res-path (resource-path ns-symbol)]
-    (rt/indexing-push-back-reader
+    (rt/source-logging-push-back-reader
      (PushbackReader.
       (resource-reader res-path)))
     (throw (ex-info (format "Resource path not found for namespace: %s" (name ns-symbol))
@@ -75,8 +75,7 @@
   [source-reader]
   ;; `read-form` will return `nil` at the end of the file so keep reading forms until we run out
   (letfn [(read-form []
-            (binding [*read-eval* false
-                      r/*data-readers* *data-readers*]
+            (binding [*read-eval* false]
               (r/read {:eof       ::eof
                        :features  #{:clj}
                        :read-cond :allow}
