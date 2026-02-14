@@ -4,7 +4,7 @@
             [cloverage.debug :as d]
             [cloverage.rewrite :refer [unchunk]]
             [cloverage.source :as source]
-            [clojure.walk :as rw]
+            [riddley.walk :as rw]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn- iobj? [form]
