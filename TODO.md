@@ -18,29 +18,38 @@ In no particular order, things that should be done:
 - **Threading macros**: Fixed by using riddley 0.2.2 (which includes bb support) instead of clojure.walk.
 - **`case` instrumentation**: Fixed by aligning SCI's `case*` format with JVM Clojure.
 - **`cli/cli` deprecated API**: Ported to `cli/parse-opts`.
+- **`report-test` loading**: Fixed in SCI — `read` with `nil` eof-value was throwing instead of returning `nil`.
 
 ### Remaining issues
 
+74 tests, 236 assertions, 30 failures, 12 errors.
+
+Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
+
 #### cloverage.args-test
-- `validate!` - 2 extra failures vs JVM. Needs investigation.
+- `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
+- `parse-custom-report` - 2 errors. Cannot locate `cloverage/custom_reporter` on classpath (sample source-paths not on bb classpath).
 
 #### cloverage.coverage-test
-- `test-eval-try` - error + failure on bb
-- `test-wrap-new` - 3 errors on bb (constructor interop: `java.io.StringReader.` wrapped in `(do ...)`)
-- `propagates-fn-call-type-hint` - `:tag` metadata not preserved on bb
-- `test-instrument-gets-lines` - error on bb
-- `test-all-reporters` - error on bb
-- `test-main` - error on bb
+- `test-eval-try` - 1 error + 1 failure
+- `test-wrap-new` - 3 errors (constructor interop: `java.io.StringReader.` wrapped in `(do ...)`)
+- `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
+- `test-instrument-gets-lines` - 1 error
+- `test-all-reporters` - 1 error
+- `test-main` - 1 error
+
+#### cloverage.dependency-test
+- `test-dependency-sort` - 1 error
 
 #### cloverage.instrument-test
-- `test-form-type` - 4 failures on bb (0 on JVM). Form type detection differs.
-- `instrument-java-interop-forms-test` - 2 failures + 4 errors on bb (1 failure on JVM)
-- `instrument-inlined-primitives-test` - 6 failures + 1 error on bb (6 failures on JVM too)
-- `test-instrumenting-fn-call-forms-propogates-metadata` - 1 failure on bb (0 on JVM)
-- `test-wrap-deftype-methods` - 2 failures on bb (0 on JVM). deftype handling differs.
+- `test-form-type` - 4 failures (0 on JVM). Inlined fn detection differs in bb.
+- `instrument-java-interop-forms-test` - 1 failure (1 failure on JVM too)
+- `instrument-inlined-primitives-test` - 5 failures + 1 error (6 failures on JVM too)
+- `test-instrumenting-fn-call-forms-propogates-metadata` - 1 failure (0 on JVM)
+- `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
 
-#### cloverage.report-test
-- Fails to load on bb. `get-resource-as-stream` returns nil for sample data files. May be a classloader issue with `dev-resources/`.
+#### cloverage.report.console-test
+- `check-colorize` - 14 failures. Locale issue: decimal separator is `,` instead of `.` in bb (missing `-Duser.language=en-US` JVM opt).
 
 #### cloverage.coverage (source)
 - `.deref ^IDeref *covered*` changed to `@*covered*`. Original form doesn't work in bb.
