@@ -6,6 +6,6 @@
         org.clojure/java.classpath {:mvn/version "1.0.0"}
         org.clojure/data.xml {:mvn/version "0.2.0-alpha6"}
         org.clojure/data.json {:mvn/version "2.4.0"}
-        riddley/riddley {:git/url "https://github.com/borkdude/riddley" :git/sha "d3e52a556dd47199dc2f1d1eb2c04a852050a631"}
+        riddley/riddley {:mvn/version "0.2.2"}
         slingshot/slingshot {:mvn/version "0.12.2"}}
  :aliases {:test {:extra-paths ["test" "test-resources" "dev-resources"]}}}

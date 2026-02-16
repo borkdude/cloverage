@@ -15,7 +15,7 @@ In no particular order, things that should be done:
 
 ### Resolved
 
-- **Threading macros**: Fixed by using riddley (with bb-compatible fork) instead of clojure.walk.
+- **Threading macros**: Fixed by using riddley 0.2.2 (which includes bb support) instead of clojure.walk.
 - **`case` instrumentation**: Fixed by aligning SCI's `case*` format with JVM Clojure.
 - **`cli/cli` deprecated API**: Ported to `cli/parse-opts`.
 
