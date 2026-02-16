@@ -10,7 +10,7 @@
         slingshot/slingshot {:mvn/version "0.12.2"}}
  :tasks
  {test:bb {:doc "Run bb tests"
-           :extra-paths ["test" "test-resources" "dev-resources"]
+           :extra-paths ["test" "test-resources" "dev-resources" "sample"]
            :extra-deps {io.github.cognitect-labs/test-runner
                         {:git/tag "v0.5.0" :git/sha "b3fd0d2"}}
            :requires ([cognitect.test-runner :as tr])

@@ -19,10 +19,11 @@ In no particular order, things that should be done:
 - **`case` instrumentation**: Fixed by aligning SCI's `case*` format with JVM Clojure.
 - **`cli/cli` deprecated API**: Ported to `cli/parse-opts`.
 - **`report-test` loading**: Fixed in SCI — `read` with `nil` eof-value was throwing instead of returning `nil`.
+- **`letfn` with duplicate names**: Fixed in SCI — `letfn` crashed with ClassCastException when duplicate function names were used.
 
 ### Remaining issues
 
-74 tests, 236 assertions, 16 failures, 12 errors.
+74 tests, 247 assertions, 26 failures, 7 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
@@ -31,18 +32,17 @@ Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 
 #### cloverage.args-test
 - `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
-- `parse-custom-report` - 2 errors. Cannot locate `cloverage/custom_reporter` on classpath (sample source-paths not on bb classpath).
 
 #### cloverage.coverage-test
-- `test-eval-try` - 1 error + 1 failure
-- `test-wrap-new` - 3 errors (constructor interop: `java.io.StringReader.` wrapped in `(do ...)`)
+- `test-eval-try` - 1 error + 1 failure. `Exception.` constructor syntax not supported in SCI.
+- `test-wrap-new` - 3 errors. `String.` constructor syntax not supported in SCI.
 - `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
-- `test-instrument-gets-lines` - 1 error
-- `test-all-reporters` - 1 error
-- `test-main` - 1 error
+- `test-instrument-gets-lines` - 4 failures. Instrumented line counts differ from JVM.
+- `test-all-reporters` - 5 failures + 1 error (was: 1 error). Now runs further after letfn fix.
+- `test-main` - 1 failure (was: 1 error). Now runs further after letfn fix.
 
 #### cloverage.dependency-test
-- `test-dependency-sort` - 1 error
+- `test-dependency-sort` - 1 error. Cannot read ns declaration for `clojure.stacktrace` — bb built-in nses don't have source files on classpath.
 
 #### cloverage.instrument-test
 - `test-form-type` - 4 failures (0 on JVM). Inlined fn detection differs in bb.
