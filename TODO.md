@@ -22,9 +22,12 @@ In no particular order, things that should be done:
 
 ### Remaining issues
 
-74 tests, 236 assertions, 30 failures, 12 errors.
+74 tests, 236 assertions, 16 failures, 12 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
+
+Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
+(the babashka/dev alias in `~/.clojure/deps.edn` includes `-Duser.language=en -Duser.country=US` to match native bb locale behavior)
 
 #### cloverage.args-test
 - `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
@@ -47,9 +50,6 @@ Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.
 - `instrument-inlined-primitives-test` - 5 failures + 1 error (6 failures on JVM too)
 - `test-instrumenting-fn-call-forms-propogates-metadata` - 1 failure (0 on JVM)
 - `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
-
-#### cloverage.report.console-test
-- `check-colorize` - 14 failures. Locale issue: decimal separator is `,` instead of `.` in bb (missing `-Duser.language=en-US` JVM opt).
 
 #### cloverage.coverage (source)
 - `.deref ^IDeref *covered*` changed to `@*covered*`. Original form doesn't work in bb.
