@@ -20,10 +20,11 @@ In no particular order, things that should be done:
 - **`cli/cli` deprecated API**: Ported to `cli/parse-opts`.
 - **`report-test` loading**: Fixed in SCI — `read` with `nil` eof-value was throwing instead of returning `nil`.
 - **`letfn` with duplicate names**: Fixed in SCI — `letfn` crashed with ClassCastException when duplicate function names were used.
+- **`ClassName.` constructor syntax**: Fixed in SCI — `macroexpand-1` now expands `(ClassName. args)` to `(new ClassName args)`, matching JVM Clojure.
 
 ### Remaining issues
 
-74 tests, 247 assertions, 26 failures, 7 errors.
+74 tests, 247 assertions, 25 failures, 3 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
@@ -34,8 +35,8 @@ Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 - `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
 
 #### cloverage.coverage-test
-- `test-eval-try` - 1 error + 1 failure. `Exception.` constructor syntax not supported in SCI.
-- `test-wrap-new` - 3 errors. `String.` constructor syntax not supported in SCI.
+- `test-eval-try` - 1 failure. Constructor instrumentation now works but test expectations differ.
+- `test-wrap-new` - 1 failure. Constructor instrumentation now works but test expectations differ.
 - `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
 - `test-instrument-gets-lines` - 4 failures. Instrumented line counts differ from JVM.
 - `test-all-reporters` - 5 failures + 1 error (was: 1 error). Now runs further after letfn fix.
