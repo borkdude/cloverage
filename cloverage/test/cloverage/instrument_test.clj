@@ -3,7 +3,7 @@
             [clojure.test :as t]
             [clojure.tools.logging :as log]
             [cloverage.instrument :as inst]
-            [clojure.walk :as rw]))
+            [riddley.walk :as rw]))
 
 (def ^:private bb? (System/getProperty "babashka.version"))
 
@@ -146,21 +146,24 @@
                (inst/do-wrap #'inst/no-instr 0 form nil))))))
 
 (t/deftest test-wrap-deftype-methods
-  ;; (deftype ...) expands to (let [] (deftype* ...))
-  ;; ignore the let form & binding because we're only interested in how `deftype*` gets instrumented
-  (let [form (nth
-              (macroexpand-1
-               (list 'deftype 'MyType []
-                     'Protocol
-                     (list 'method []
-                           (with-meta '(do-something) {:line 1337}))))
+  ;; On JVM, (deftype ...) expands to (let [] (deftype* ...) ...)
+  ;; On bb, it expands directly to (deftype* ...), so we wrap it in let to normalize
+  (let [expand-deftype (fn [& body]
+                         (let [expanded (macroexpand-1 (apply list 'deftype 'MyType [] body))]
+                           (if bb?
+                             (list 'clojure.core/let [] expanded)
+                             expanded)))
+        form (nth
+              (expand-deftype
+               'Protocol
+               (list 'method []
+                     (with-meta '(do-something) {:line 1337})))
               2)
         wrapped (nth
-                 (macroexpand-1
-                  (list 'deftype 'MyType []
-                        'Protocol
-                        (list 'method []
-                              (inst/wrap #'inst/no-instr 1337 '(do-something)))))
+                 (expand-deftype
+                  'Protocol
+                  (list 'method []
+                        (inst/wrap #'inst/no-instr 1337 '(do-something))))
                  2)]
     (t/is (= (first form) 'deftype*)) ; make sure we're actually looking at the right thing
     (t/is (not= form wrapped))

@@ -30,17 +30,17 @@ In no particular order, things that should be done:
 - **`:tag` metadata on vars**: Fixed in SCI — `copy-var` now preserves `:tag` metadata from original JVM vars.
 - **`fn-sym` in args.clj**: Use `(class f)` instead of `.getClass`, filter out SCI internal fn class names.
 
-### Remaining issues
+- **`resolve` NPE during code walking**: Fixed in SCI — `resolve` inside a macro body no longer NPEs when bindings lack analyzer idx state.
+- **`test-wrap-deftype-methods`**: In bb, `deftype` expands directly to `deftype*` (no wrapping `let`). Normalized test by wrapping in `let` on bb.
 
-74 tests, 225 assertions, 1 failure, 1 error.
+### Status
+
+74 tests, 225 assertions, 0 failures, 0 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
 Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 (the babashka/dev alias in `~/.clojure/deps.edn` includes `-Duser.language=en -Duser.country=US` to match native bb locale behavior)
-
-#### cloverage.instrument-test
-- `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
 
 #### cloverage.coverage (source)
 - `.deref ^IDeref *covered*` changed to `@*covered*`. Original form doesn't work in bb.
