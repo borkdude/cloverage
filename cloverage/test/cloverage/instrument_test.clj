@@ -5,6 +5,11 @@
             [cloverage.instrument :as inst]
             [clojure.walk :as rw]))
 
+(def ^:private bb? (System/getProperty "babashka.version"))
+
+(defmacro if-bb [then else]
+  (if bb? then else))
+
 (def simple-forms
   "Simple forms that do not require macroexpansion and have no side effects."
   [1
@@ -33,39 +38,43 @@
 
 (t/deftest test-form-type
   (doseq [[message form->expected]
-          {"Atomic forms"
-           {[1]     :atomic
-            ["foo"] :atomic
-            ['bar]  :atomic}
+          (merge
+           {"Atomic forms"
+            {[1]     :atomic
+             ["foo"] :atomic
+             ['bar]  :atomic}
 
-           "Collections"
-           {[[1 2 3 4]]   :coll
-            [{1 2 3 4}]   :coll
-            [#{1 2 3 4}]  :coll
-            [(Record. 1)] :coll}
+            "Collections"
+            {[[1 2 3 4]]   :coll
+             [{1 2 3 4}]   :coll
+             [#{1 2 3 4}]  :coll
+             [(Record. 1)] :coll}
 
-           "do & loop"
-           {['(do 1 2 3)]               :do
-            ;; fake a local binding
-            '[(loop 1 2 3) {loop hoop}] :list}
+            "do & loop"
+            {['(do 1 2 3)]               :do
+             ;; fake a local binding
+             '[(loop 1 2 3) {loop hoop}] :list}
 
-           "Inlined function calls"
-           {['(int 1)]            :inlined-fn-call
-            [`(int 1)]            :inlined-fn-call
-            [`(int 1) '{int int}] :inlined-fn-call}
+            "Local vars overshadow inlined fn calls; make sure this is detected correctly"
+            {'[(int) {int int}] :list}
 
-           "Local vars overshadow inlined fn calls; make sure this is detected correctly"
-           {'[(int) {int int}] :list}
+            "Lists starting with other lists"
+            {['((or + 1) 1 2)] :list}
 
-           "If some arities are inlined and others are not, only return `:inlined-fn-call` when inlined"
-           {['(+ 1)]   :list
-            ['(+ 1 2)] :inlined-fn-call}
+            "List-like classes e.g. clojure.lang.Cons for which `list?` is false"
+            {[(cons 1 '(2 3))] :list}}
 
-           "Lists starting with other lists"
-           {['((or + 1) 1 2)] :list}
+           ;; SCI doesn't support inlined functions
+           (if-bb
+             {}
+             {"Inlined function calls"
+              {['(int 1)]            :inlined-fn-call
+               [`(int 1)]            :inlined-fn-call
+               [`(int 1) '{int int}] :inlined-fn-call}
 
-           "List-like classes e.g. clojure.lang.Cons for which `list?` is false"
-           {[(cons 1 '(2 3))] :list}}
+              "If some arities are inlined and others are not, only return `:inlined-fn-call` when inlined"
+              {['(+ 1)]   :list
+               ['(+ 1 2)] :inlined-fn-call}}))
 
           [[form env] expected] form->expected]
     (t/testing message
@@ -286,8 +295,11 @@
           (t/is (= true
                    @evalled-original-form?)))))))
 
+;; Java interop on clojure.lang.RT not available in native bb
 (t/deftest instrument-java-interop-forms-test
-  (t/testing "Java interop forms should get instrumented correctly (#304)"
+  (if-bb
+    nil
+    (t/testing "Java interop forms should get instrumented correctly (#304)"
     ;; these two syntaxes are equivalent
     (t/testing "(. class-or-instance method & args) syntax"
       (t/is (= '(do (. clojure.lang.RT count (do [(do 3) (do 4)])))
@@ -310,10 +322,13 @@
           (t/is (= :a
                    (eval form)))
           (t/is (= (list 'do (list '. clojure.lang.RT 'nth '(do [(do :a) (do :b) (do :c)]) '(do 0) '(do nil)))
-                   (rw/macroexpand-all (inst/instrument-form #'inst/nop nil form)))))))))
+                   (rw/macroexpand-all (inst/instrument-form #'inst/nop nil form))))))))))
 
+;; SCI doesn't support inlined functions
 (t/deftest instrument-inlined-primitives-test
-  (t/testing "Inline primitive cast functions like int() should be instrumented correctly (#277)"
+  (if-bb
+    nil
+    (t/testing "Inline primitive cast functions like int() should be instrumented correctly (#277)"
     (t/is (= '(. clojure.lang.RT (intCast 2))
              (rw/macroexpand-all (inst/instrument-form #'inst/no-instr nil '(int 2)))
              (rw/macroexpand-all (inst/instrument-form #'inst/no-instr nil `(int 2)))))
@@ -352,4 +367,4 @@
                      (do (.
                           clojure.lang.RT
                           (clojure.core/count (do [(do 3) (do 4)]))))))
-               (rw/macroexpand-all (inst/instrument-form #'inst/nop nil '(= (count [1 2]) (count [3 4])))))))))
+               (rw/macroexpand-all (inst/instrument-form #'inst/nop nil '(= (count [1 2]) (count [3 4]))))))))))

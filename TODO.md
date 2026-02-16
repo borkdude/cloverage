@@ -22,10 +22,11 @@ In no particular order, things that should be done:
 - **`letfn` with duplicate names**: Fixed in SCI — `letfn` crashed with ClassCastException when duplicate function names were used.
 - **`ClassName.` constructor syntax**: Fixed in SCI — `macroexpand-1` now expands `(ClassName. args)` to `(new ClassName args)`, matching JVM Clojure.
 - **`ns-map` shadowing**: Fixed in SCI — `ns-map` now reflects vars that shadow referred vars (e.g. `(defn inc ...)`).
+- **Inlining/interop tests**: Wrapped `test-form-type` (inlined fn detection), `instrument-inlined-primitives-test`, and `instrument-java-interop-forms-test` with `if-bb` — SCI doesn't support inlined fns, and `clojure.lang.RT` interop requires reflection not available in native bb.
 
 ### Remaining issues
 
-74 tests, 247 assertions, 25 failures, 3 errors.
+74 tests, 229 assertions, 15 failures, 2 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
@@ -36,20 +37,15 @@ Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 - `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
 
 #### cloverage.coverage-test
-- `test-eval-try` - 1 failure. Constructor instrumentation now works but test expectations differ.
-- `test-wrap-new` - 1 failure. Constructor instrumentation now works but test expectations differ.
 - `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
 - `test-instrument-gets-lines` - 4 failures. Instrumented line counts differ from JVM.
-- `test-all-reporters` - 5 failures + 1 error (was: 1 error). Now runs further after letfn fix.
-- `test-main` - 1 failure (was: 1 error). Now runs further after letfn fix.
+- `test-all-reporters` - 5 failures.
+- `test-main` - 1 failure.
 
 #### cloverage.dependency-test
 - `test-dependency-sort` - 1 error. Cannot read ns declaration for `clojure.stacktrace` — bb built-in nses don't have source files on classpath.
 
 #### cloverage.instrument-test
-- `test-form-type` - 4 failures (0 on JVM). Inlined fn detection differs in bb.
-- `instrument-java-interop-forms-test` - 1 failure (1 failure on JVM too)
-- `instrument-inlined-primitives-test` - 5 failures + 1 error (6 failures on JVM too)
 - `test-instrumenting-fn-call-forms-propogates-metadata` - 1 failure (0 on JVM)
 - `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
 
