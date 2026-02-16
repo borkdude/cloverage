@@ -27,10 +27,11 @@ In no particular order, things that should be done:
 - **Reporter snapshots**: Added bb-specific expected report files in `test/resources/bb/` (coverage numbers differ due to no inlining).
 - **Inlined expansions in test-instrument-gets-lines**: Skipped inlined form assertions on bb with `if-bb`.
 - **test-dependency-sort**: Uses `with-redefs` on bb (built-in nses have no source on classpath).
+- **`:tag` metadata on vars**: Fixed in SCI — `copy-var` now preserves `:tag` metadata from original JVM vars.
 
 ### Remaining issues
 
-74 tests, 225 assertions, 5 failures, 1 error.
+74 tests, 225 assertions, 3 failures, 1 error.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
@@ -40,11 +41,7 @@ Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 #### cloverage.args-test
 - `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
 
-#### cloverage.coverage-test
-- `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
-
 #### cloverage.instrument-test
-- `test-instrumenting-fn-call-forms-propogates-metadata` - 1 failure (0 on JVM)
 - `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
 
 #### cloverage.coverage (source)
