@@ -28,18 +28,16 @@ In no particular order, things that should be done:
 - **Inlined expansions in test-instrument-gets-lines**: Skipped inlined form assertions on bb with `if-bb`.
 - **test-dependency-sort**: Uses `with-redefs` on bb (built-in nses have no source on classpath).
 - **`:tag` metadata on vars**: Fixed in SCI — `copy-var` now preserves `:tag` metadata from original JVM vars.
+- **`fn-sym` in args.clj**: Use `(class f)` instead of `.getClass`, filter out SCI internal fn class names.
 
 ### Remaining issues
 
-74 tests, 225 assertions, 3 failures, 1 error.
+74 tests, 225 assertions, 1 failure, 1 error.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
 Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 (the babashka/dev alias in `~/.clojure/deps.edn` includes `-Duser.language=en -Duser.country=US` to match native bb locale behavior)
-
-#### cloverage.args-test
-- `validate!` - 2 failures. Validation fn name prints as `sci.impl.fns/fun/arity-1` instead of `cloverage.args/regexes-or-strings?`.
 
 #### cloverage.instrument-test
 - `test-wrap-deftype-methods` - 1 error + 1 failure (0 on JVM). deftype handling differs.
