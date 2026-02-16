@@ -5,7 +5,7 @@
             [cloverage.coverage :as cov]
             [cloverage.instrument :as inst]
             [cloverage.source :as src]
-            [clojure.walk :as rw]
+            [riddley.walk :as rw]
             [clojure.java.io :as io]))
 
 (def ^:private bb? (System/getProperty "babashka.version"))

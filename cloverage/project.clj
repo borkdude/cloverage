@@ -19,7 +19,7 @@
                         ["snapshots" :clojars]]
   :dependencies [[org.clojure/clojure "1.11.1" :scope "provided"]
                  [org.clojure/tools.reader "1.3.6"]
-                 [org.clojure/tools.cli "0.4.2"]
+                 [org.clojure/tools.cli "1.1.230"]
                  [org.clojure/tools.logging "0.5.0"]
                  [org.clojure/tools.namespace "1.3.0"]
                  [org.clojure/java.classpath "1.0.0"]

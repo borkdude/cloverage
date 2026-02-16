@@ -77,7 +77,7 @@
           (symbol (.getName ^Class o))
           (when (var? o)
             (let [^clojure.lang.Var o o]
-              (symbol o) #_(symbol (-> o .ns .name name) (-> o .sym name)))))
+              (symbol o))))
         ;; changed to returned unnamespaced symbol if it fails to resolve
         s))))
 
@@ -185,10 +185,7 @@
     res))
 
 (defn- var->sym [^clojure.lang.Var fvar]
-  (symbol fvar)
-  #_(let [it (name (.sym fvar))
-        nsn (name (ns-name (.ns fvar)))]
-    (symbol nsn it)))
+  (symbol fvar))
 
 (defmulti do-wrap
   "Traverse the given form and wrap all its sub-forms in a function that evals
@@ -295,7 +292,7 @@
   ;; https://github.com/ztellman/riddley/issues/33. We can work around it by removing the `::rw/transformed` key from
   ;; the form's metadata if present
   (let [form (vary-meta form dissoc ::rw/transformed)]
-    (wrap f line (macroexpand form))))
+    (wrap f line (rw/macroexpand form))))
 
 ;; Don't descend into atomic forms, but do wrap them
 (defmethod do-wrap :atomic [f line form _]
