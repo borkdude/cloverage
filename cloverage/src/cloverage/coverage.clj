@@ -3,7 +3,7 @@
   (:require [clojure.java.classpath :as cp]
             [clojure.java.io :as io]
             [clojure.test :as test]
-            #_[clojure.test.junit :as junit]
+            [clojure.test.junit :as junit]
             [clojure.tools.namespace.find :as ns-find]
             [cloverage.args :as args]
             [cloverage.debug :as debug]
@@ -212,7 +212,7 @@
                       {:errors (reduce + ((juxt :error :fail)
                                           (apply test/run-tests nses)))})]
       (if junit?
-        false #_(do
+        (do
           (.mkdirs (io/file output))
           (binding [test/*test-out* (io/writer (io/file output "junit.xml"))]
             (junit/with-junit-output (run-tests))))

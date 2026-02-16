@@ -23,10 +23,11 @@ In no particular order, things that should be done:
 - **`ClassName.` constructor syntax**: Fixed in SCI — `macroexpand-1` now expands `(ClassName. args)` to `(new ClassName args)`, matching JVM Clojure.
 - **`ns-map` shadowing**: Fixed in SCI — `ns-map` now reflects vars that shadow referred vars (e.g. `(defn inc ...)`).
 - **Inlining/interop tests**: Wrapped `test-form-type` (inlined fn detection), `instrument-inlined-primitives-test`, and `instrument-java-interop-forms-test` with `if-bb` — SCI doesn't support inlined fns, and `clojure.lang.RT` interop requires reflection not available in native bb.
+- **`clojure.test.junit`**: Added as built-in source namespace in bb. Restored junit runner in cloverage's `coverage.clj`.
 
 ### Remaining issues
 
-74 tests, 229 assertions, 15 failures, 2 errors.
+74 tests, 229 assertions, 13 failures, 2 errors.
 
 Run tests with: `cd cloverage && bb test:bb` (requires babashka with SCI > 0.12.51)
 
@@ -39,8 +40,7 @@ Dev build: `cd cloverage && clojure -M:babashka/dev --config bb.edn test:bb`
 #### cloverage.coverage-test
 - `propagates-fn-call-type-hint` - 1 failure. `:tag` metadata not preserved on bb.
 - `test-instrument-gets-lines` - 4 failures. Instrumented line counts differ from JVM.
-- `test-all-reporters` - 5 failures.
-- `test-main` - 1 failure.
+- `test-all-reporters` - 4 failures. Coverage numbers differ (no inlining in bb).
 
 #### cloverage.dependency-test
 - `test-dependency-sort` - 1 error. Cannot read ns declaration for `clojure.stacktrace` — bb built-in nses don't have source files on classpath.
