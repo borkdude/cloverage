@@ -21,6 +21,7 @@ In no particular order, things that should be done:
 - **`report-test` loading**: Fixed in SCI — `read` with `nil` eof-value was throwing instead of returning `nil`.
 - **`letfn` with duplicate names**: Fixed in SCI — `letfn` crashed with ClassCastException when duplicate function names were used.
 - **`ClassName.` constructor syntax**: Fixed in SCI — `macroexpand-1` now expands `(ClassName. args)` to `(new ClassName args)`, matching JVM Clojure.
+- **`ns-map` shadowing**: Fixed in SCI — `ns-map` now reflects vars that shadow referred vars (e.g. `(defn inc ...)`).
 
 ### Remaining issues
 
